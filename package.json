@@ -12,7 +12,8 @@
     "test": "echo \"No test specified\" && exit 0",
     "dev": "quasar dev -m pwa",
     "build": "quasar build -m pwa",
-    "deploy": "QUASAR_PUBLISH_PATH=/Na-tap-doc/ quasar build -m pwa && gh-pages -d dist/pwa",
+    "deploy": "QUASAR_PUBLISH_PATH=/Na-tap-doc/ quasar build -m pwa && gh-pages -d dist/pwa --nojekyll",
+    "gh-pages": "gh-pages -d dist/pwa",
     "postinstall": "quasar prepare"
   },
   "dependencies": {

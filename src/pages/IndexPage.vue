@@ -13,13 +13,15 @@
                  :rows="3"
                  :input-style="{ fontSize: fontSizeRem, lineHeight: fontSize * 1.5 + 'rem' }" />
 
-        <div class="row justify-between no-wrap">
-          <div class="col-auto q-gutter-sm">
-            <q-btn label="Câu ngẫu nhiên"
-                   color="primary"
-                   @click="setSampleText(randomSentence())" />
-            <q-btn label="Xóa đoạn văn"
-                   @click="inputText = ''" />
+        <div class="row justify-between q-gutter-y-md">
+          <div class="col-auto">
+            <div class="items-center q-gutter-sm">
+              <q-btn label="Câu ngẫu nhiên"
+                     color="primary"
+                     @click="setSampleText(randomSentence())" />
+              <q-btn label="Xóa đoạn văn"
+                     @click="inputText = ''" />
+            </div>
           </div>
           <div class="col-auto">
             <div class="row items-center q-gutter-sm">
@@ -41,31 +43,29 @@
               <p style="color: red">Vui lòng nhập đoạn văn!</p>
             </template>
             <template v-else>
-              <div class="q-gutter-md">
-                <div class="q-gutter-sm">
-                  <template v-for="({ type, value, syllable }, index) in words"
-                            :key="index">
-                    <template v-if="'word' === type">
-                      <span class="syllable">
-                        <span v-if="syllable[0]"
-                              class="initial-consonant">
-                          {{ syllable[0] }}
-                        </span>
-                        <span class="rhyme">
-                          {{ syllable[1] }}
-                        </span>
+              <div class="q-gutter-sm">
+                <template v-for="({ type, value, syllable }, index) in words"
+                          :key="index">
+                  <template v-if="'word' === type">
+                    <span class="syllable">
+                      <span v-if="syllable[0]"
+                            class="initial-consonant">
+                        {{ syllable[0] }}
                       </span>
-                    </template>
-                    <br v-else-if="'newline' === type" />
-                    <span v-else>{{ value }}</span>
+                      <span class="rhyme">
+                        {{ syllable[1] }}
+                      </span>
+                    </span>
                   </template>
-                </div>
+                  <br v-else-if="'newline' === type" />
+                  <span v-else>{{ value }}</span>
+                </template>
               </div>
             </template>
           </div>
         </q-card-section>
 
-        <q-card-section class="sample-sentences">
+        <q-card-section>
           <h3 class="text-h6">Câu mẫu:</h3>
           <div class="q-gutter-sm">
             <template v-for="sentence in sampleSentences"
@@ -166,7 +166,7 @@ const randomSentence = () => sampleSentences[Math.floor(Math.random() * sampleSe
 
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .output {
   line-height: 1.6;
   text-align: left;
@@ -184,16 +184,7 @@ const randomSentence = () => sampleSentences[Math.floor(Math.random() * sampleSe
 }
 
 .syllable {
-  margin-right: 5px;
   display: inline-block;
-}
-
-.sound-icon {
-  cursor: pointer;
-  margin-left: 2px;
-}
-
-.sample-sentences {
-  margin-top: 20px;
+  margin-right: .5rem;
 }
 </style>
