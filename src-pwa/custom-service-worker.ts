@@ -1,16 +1,21 @@
-/* eslint-env serviceworker */
-
 /*
  * This file (which will be your service worker)
  * is picked up by the build system ONLY if
  * quasar.config file > pwa > workboxMode is set to "InjectManifest"
  */
 
+declare const self: ServiceWorkerGlobalScope &
+  typeof globalThis & { skipWaiting: () => void }
+
 import { clientsClaim } from 'workbox-core'
-import { precacheAndRoute, cleanupOutdatedCaches, createHandlerBoundToURL } from 'workbox-precaching'
+import {
+  precacheAndRoute,
+  cleanupOutdatedCaches,
+  createHandlerBoundToURL,
+} from 'workbox-precaching'
 import { registerRoute, NavigationRoute } from 'workbox-routing'
 
-self.skipWaiting()
+void self.skipWaiting()
 clientsClaim()
 
 // Use with precache injection

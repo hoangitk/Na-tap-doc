@@ -3,7 +3,25 @@
     <q-header elevated>
       <q-toolbar>
 
-        <q-toolbar-title> 👧🏻 📢 🇻🇳 Na iu tập đọc Tiếng Việt </q-toolbar-title>
+        <q-toolbar-title> 👧🏻 📢 Na iu tập đọc Tiếng Việt </q-toolbar-title>
+
+        <q-space />
+
+        <q-btn round
+               dense
+               flat
+               icon="home"
+               to="/">
+          <q-tooltip>Bé tập đọc</q-tooltip>
+        </q-btn>
+
+        <q-btn round
+               dense
+               flat
+               icon="storage"
+               to="/db">
+          <q-tooltip>Dữ liệu</q-tooltip>
+        </q-btn>
 
       </q-toolbar>
     </q-header>
@@ -14,6 +32,6 @@
   </q-layout>
 </template>
 
-<script setup>
+<script setup lang="ts">
 
 </script>

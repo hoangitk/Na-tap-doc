@@ -42,6 +42,12 @@ export default defineConfig((/* ctx */) => {
         node: 'node20',
       },
 
+      typescript: {
+        strict: true,
+        vueShim: true,
+        // extendTsConfig (tsConfig) {}
+      },
+
       vueRouterMode: 'hash', // available values: 'hash', 'history'
       // vueRouterBase,
       // vueDevtools,
@@ -62,13 +68,29 @@ export default defineConfig((/* ctx */) => {
       // viteVuePluginOptions: {},
 
       vitePlugins: [
+        ['unplugin-auto-import/vite', {
+          imports: [
+            'vue', 'vue-router', 'vue-i18n'
+          ],
+          dts: true,
+          eslintrc: {
+            enabled: true, // Default `false`
+            // provide path ending with `.mjs` or `.cjs` to generate the file with the respective format
+            filepath: './.eslintrc-auto-import.mjs', // Default `./.eslintrc-auto-import.json`
+            globalsPropValue: true, // Default `true`, (true | false | 'readonly' | 'readable' | 'writable' | 'writeable')
+          },
+        }],
         [
           'vite-plugin-checker',
           {
+            vueTsc: true,
             eslint: {
-              lintCommand: 'eslint -c ./eslint.config.js "./src*/**/*.{js,mjs,cjs,vue}"',
+              lintCommand: 'eslint -c ./eslint.config.js "./src*/**/*.{ts,js,mjs,cjs,vue}"',
               useFlatConfig: true,
             },
+            overlay: {
+              initialIsOpen: false
+            }
           },
           { server: false },
         ],
@@ -81,6 +103,7 @@ export default defineConfig((/* ctx */) => {
         key: './certs/local-dev.key',
         cert: './certs/local-dev.crt'
       },
+      // https: true,
       open: true, // opens browser window automatically
     },
 
