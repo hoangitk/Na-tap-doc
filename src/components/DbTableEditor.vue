@@ -1,8 +1,10 @@
 <template>
   <q-table v-if="tableName"
+           v-bind="$attrs"
            :rows="rows ?? []"
            :columns
            :pagination="{ rowsPerPage: 10 }"
+           :grid
            separator="cell"
            row-key="id"
            flat
@@ -24,10 +26,13 @@
     </template>
   </q-table>
   <div class="q-mt-md flex justify-end">
+    <q-toggle v-model="grid"
+              label="Xem dạng lưới" />
     <q-btn flat
            icon="add"
            label="Add Row"
            @click="addRow()" />
+    <slot name="footer" />
   </div>
 </template>
 
@@ -37,9 +42,10 @@ import { liveQuery } from 'dexie'
 import { useObservable } from '@vueuse/rxjs'
 import db from 'src/db'
 
-const { tableName, columns: defineColumns } = defineProps({
+const { tableName, columns: defineColumns, grid: initGrid } = defineProps({
   tableName: { type: String, required: true },
   columns: { type: Array, require: true },
+  grid: Boolean
 })
 
 // const pagination = ref({
@@ -54,10 +60,10 @@ const columns = computed(() => [
   {
     name: 'actions', classes: 'q-table--col-auto-width',
     headerClasses: 'q-table--col-auto-width'
-
   }
 ])
 const rows = useObservable(liveQuery(() => db.table(tableName).reverse().toArray()))
+const grid = ref(initGrid)
 /*
 :pagination="{ rowsPerPage: 0 }"
  selection="multiple"

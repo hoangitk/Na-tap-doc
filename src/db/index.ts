@@ -1,17 +1,20 @@
 import { Dexie } from 'dexie'
-import type { EntityTable } from 'dexie'
+import type { EntityTable, InsertType } from 'dexie'
 
-interface Lesson {
+export interface Lesson {
   id: number
   title: string
   content: string
 }
-interface Sentence {
+export type LessonInsert = InsertType<Lesson, 'id'>
+
+export interface Sentence {
   id: number,
   sentence: string
 }
+export type SentenceInsert = InsertType<Sentence, 'id'>
 
-class Db extends Dexie {
+export class Db extends Dexie {
   lessons!: EntityTable<Lesson, 'id'>
   sentences!: EntityTable<Sentence, 'id'>
 
@@ -27,4 +30,3 @@ class Db extends Dexie {
 const db = new Db()
 
 export default db
-export type { Db, Lesson, Sentence }

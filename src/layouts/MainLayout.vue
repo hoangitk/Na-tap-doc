@@ -19,7 +19,7 @@
                dense
                flat
                icon="storage"
-               to="/db">
+               to="/data">
           <q-tooltip>Dữ liệu</q-tooltip>
         </q-btn>
 

@@ -20,6 +20,23 @@
                      @click="onRandomSampleClick" />
               <q-btn label="Xóa đoạn văn"
                      @click="inputText = ''" />
+              <q-btn-dropdown color="purple"
+                              split
+                              label="Bài học ngẫu nhiên"
+                              @click="onRandomLessonClick">
+                <q-list>
+                  <template v-for="({ id, title }) in lessonTitleList"
+                            :key="id">
+                    <q-item clickable
+                            v-close-popup
+                            @click="onLessonClick(id)">
+                      <q-item-section>
+                        <q-item-label>{{ title }}</q-item-label>
+                      </q-item-section>
+                    </q-item>
+                  </template>
+                </q-list>
+              </q-btn-dropdown>
             </div>
           </div>
           <div class="col-auto">
@@ -41,7 +58,7 @@
         </q-card-section>
 
         <q-card-section>
-          <h3 class="text-h6">Câu mẫu (top 22):</h3>
+          <h3 class="text-h6">Câu mẫu (top 22) / {{ sampleCount }}:</h3>
           <div class="q-gutter-sm">
             <template v-for="sentence in sampleSentences"
                       :key="sentence">
@@ -61,54 +78,68 @@
 
 <script setup lang="ts">
 import { QBtn } from 'quasar'
-import db from 'src/db'
+import db, { type Lesson } from 'src/db'
 import HighlightWords from 'src/components/HighlightWords.vue'
 
 const inputText = ref('')
 
 const fontSize = ref(2)
 
-function setSampleText(text: string = '') {
-  inputText.value = text
-}
-
 const sampleSentences = ref<string[]>([])
+const sampleCount = ref(0)
+const lessonTitleList = ref<{ id: number, title: string }[]>([])
+
+const lessonToText = ({ title, content }: Lesson) => `${title}\n\n${content}`
+
+async function onLessonClick(id: number) {
+  const lesson = await db.lessons.get(id)
+  if (lesson) {
+    setSampleText(lessonToText(lesson))
+  }
+}
 
 async function onRandomSampleClick() {
   const count = await db.sentences.count()
-  const randIdx = Math.random() * count
+  const randIdx = Math.floor(Math.random() * count)
   const [randSentence] = await db.sentences
-    .offset(Math.max(1, randIdx))
+    .offset(randIdx)
     .limit(1)
     .toArray()
 
   setSampleText(randSentence?.sentence)
 }
 
+async function onRandomLessonClick() {
+  const count = await db.lessons.count()
+  const randIdx = Math.floor(Math.random() * count)
+  console.log(randIdx)
+  const [lesson] = await db.lessons
+    .offset(randIdx)
+    .limit(1)
+    .toArray()
+  setSampleText(lessonToText(lesson!))
+}
+
+function setSampleText(text: string = '') {
+  inputText.value = text
+}
+
 async function loadSamples() {
   const topRows = await db.sentences.limit(22).toArray()
   sampleSentences.value = topRows?.map(r => r.sentence)
+
+  sampleCount.value = await db.sentences.count()
 }
 
-// const SaveBtn = (props: object) => {
-//   const loading = ref(false)
-//   const disable = computed(() => !inputText.value || loading.value)
-//   const onClick = async () => {
-//     const sentence = inputText.value?.trim()
-//     if (sentence) {
-//       try {
-//         loading.value = true
-//         await db.sentences.put({ sentence })
-//       } finally {
-//         loading.value = false
-//       }
-//     }
-//   }
-//   return h(QBtn, { ...props, disable: disable.value, onClick })
-// }
+async function loadLessons() {
+  await db.lessons.each(({ id, title }) => {
+    lessonTitleList.value.push({ id, title })
+  })
+}
 
 onMounted(() => {
   void loadSamples()
+  void loadLessons()
 })
 
 </script>
