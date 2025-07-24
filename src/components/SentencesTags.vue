@@ -13,25 +13,24 @@
 </template>
 
 <script setup lang="ts">
-import db from 'src/db'
+import { useLiveQuery } from 'src/db'
 
 const props = defineProps({
   top: Number
 })
 const emit = defineEmits(['tag-click'])
 
-const count = ref(0)
-const sentences = ref<string[]>([])
 const top = computed(() => props.top || 20)
+
+const sentences = useLiveQuery(async (db) => {
+  const topRows = await db.sentences.limit(top.value).toArray()
+  return topRows.map(r => r.sentence)
+})
+
+const count = useLiveQuery((db) => db.sentences.count())
 
 function onTagClick(e: { originalEvent: Event, sentence: string }) {
   emit('tag-click', e)
 }
 
-onMounted(async () => {
-  const topRows = await db.sentences.limit(top.value).toArray()
-  sentences.value = topRows?.map(r => r.sentence)
-
-  count.value = await db.sentences.count()
-})
 </script>

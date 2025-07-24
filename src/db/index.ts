@@ -1,5 +1,6 @@
-import { Dexie } from 'dexie'
+import { Dexie, liveQuery } from 'dexie'
 import type { EntityTable, InsertType } from 'dexie'
+import { useObservable, from } from '@vueuse/rxjs'
 
 export interface Lesson {
   id: number
@@ -30,3 +31,9 @@ export class Db extends Dexie {
 const db = new Db()
 
 export default db
+
+export function useLiveQuery<T>(
+  queryFn: (db: Db) => Promise<T>
+) {
+  return useObservable(from(liveQuery(() => queryFn(db))))
+}
