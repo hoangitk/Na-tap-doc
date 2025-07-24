@@ -58,17 +58,8 @@
         </q-card-section>
 
         <q-card-section>
-          <h3 class="text-h6">Câu mẫu (top 22) / {{ sampleCount }}:</h3>
-          <div class="q-gutter-sm">
-            <template v-for="sentence in sampleSentences"
-                      :key="sentence">
-              <q-btn style="text-transform: none;"
-                     color="secondary"
-                     rounded
-                     :label="sentence"
-                     @click="setSampleText(sentence)" />
-            </template>
-          </div>
+          <sentences-tags :top="20"
+                          @tag-click="({ sentence }) => setSampleText(sentence)" />
         </q-card-section>
       </q-card-section>
 
@@ -80,14 +71,17 @@
 import { QBtn } from 'quasar'
 import db, { type Lesson } from 'src/db'
 import HighlightWords from 'src/components/HighlightWords.vue'
+import { useLessonTitleList } from 'src/services/lessonService'
+import { pullFromCloud, randomLesson } from 'src/services/lessonService'
+import { randomSentence } from 'src/services/sentenceService'
+import SentencesTags from 'src/components/SentencesTags.vue'
+
+const $q = useQuasar()
 
 const inputText = ref('')
-
 const fontSize = ref(2)
 
-const sampleSentences = ref<string[]>([])
-const sampleCount = ref(0)
-const lessonTitleList = ref<{ id: number, title: string }[]>([])
+const lessonTitleList = useLessonTitleList()
 
 const lessonToText = ({ title, content }: Lesson) => `${title}\n\n${content}`
 
@@ -99,47 +93,29 @@ async function onLessonClick(id: number) {
 }
 
 async function onRandomSampleClick() {
-  const count = await db.sentences.count()
-  const randIdx = Math.floor(Math.random() * count)
-  const [randSentence] = await db.sentences
-    .offset(randIdx)
-    .limit(1)
-    .toArray()
-
+  const randSentence = await randomSentence()
   setSampleText(randSentence?.sentence)
 }
 
 async function onRandomLessonClick() {
-  const count = await db.lessons.count()
-  const randIdx = Math.floor(Math.random() * count)
-  console.log(randIdx)
-  const [lesson] = await db.lessons
-    .offset(randIdx)
-    .limit(1)
-    .toArray()
-  setSampleText(lessonToText(lesson!))
+  const randLesson = await randomLesson()
+  setSampleText(lessonToText(randLesson!))
 }
 
 function setSampleText(text: string = '') {
   inputText.value = text
 }
 
-async function loadSamples() {
-  const topRows = await db.sentences.limit(22).toArray()
-  sampleSentences.value = topRows?.map(r => r.sentence)
-
-  sampleCount.value = await db.sentences.count()
-}
-
-async function loadLessons() {
-  await db.lessons.each(({ id, title }) => {
-    lessonTitleList.value.push({ id, title })
-  })
-}
-
 onMounted(() => {
-  void loadSamples()
-  void loadLessons()
+
+  void pullFromCloud().then(([ok, msg]) => {
+    if (ok) {
+      $q.notify({
+        type: 'positive',
+        message: msg
+      })
+    }
+  })
 })
 
 </script>

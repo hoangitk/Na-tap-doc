@@ -70,7 +70,7 @@ export default defineConfig((/* ctx */) => {
       vitePlugins: [
         ['unplugin-auto-import/vite', {
           imports: [
-            'vue', 'vue-router', 'vue-i18n'
+            'vue', 'vue-router', 'vue-i18n', 'quasar', '@vueuse/core'
           ],
           dts: true,
           eslintrc: {
