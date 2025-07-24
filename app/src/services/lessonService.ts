@@ -1,6 +1,6 @@
+import type { Lesson } from "src/db"
 import db, { type LessonInsert } from "src/db"
-import { liveQuery } from 'dexie'
-// import { BulkError } from "dexie"
+import { useLiveQuery } from "src/db"
 
 const latestUpdateOn = useLocalStorage('lessons-gist-latest-update-on', 0)
 const OneDay = 24 * 60 * 60 * 1000
@@ -43,26 +43,10 @@ export async function pullFromCloud(force: boolean = false): Promise<[boolean, s
 }
 
 export function useLessonTitleList() {
-
-  const lessonTitleList = ref<{ id: number; title: string }[]>([])
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let subscription: any
-
-  tryOnMounted(() => {
-    subscription = liveQuery(async () => {
-      const lessons = await db.lessons.toArray()
-      return lessons.map(({ id, title }) => ({ id, title }))
-    }).subscribe({
-      next: data => lessonTitleList.value = data,
-      error: err => console.error('Lỗi theo dõi bài học:', err),
-    })
+  return useLiveQuery(async (db) => {
+    const lessons = db.lessons.toArray()
+    return (await lessons).map(({ id, title }) => ({ id, title }))
   })
-
-  tryOnUnmounted(() => {
-    subscription?.unsubscribe()
-  })
-
-  return lessonTitleList
 }
 
 export async function randomLesson() {
@@ -75,3 +59,5 @@ export async function randomLesson() {
     .toArray()
   return lesson
 }
+
+export const lessonToText = ({ title, content }: Lesson) => `${title}\n\n${content}`

@@ -18,7 +18,9 @@ import { useLiveQuery } from 'src/db'
 const props = defineProps({
   top: Number
 })
-const emit = defineEmits(['tag-click'])
+const emit = defineEmits<{
+  (event: 'tag-click', payload: { originalEvent: Event, sentence: string }): void
+}>()
 
 const top = computed(() => props.top || 20)
 

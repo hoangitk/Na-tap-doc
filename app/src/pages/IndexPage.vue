@@ -17,13 +17,13 @@
             <div class="items-center q-gutter-sm">
               <q-btn label="Câu ngẫu nhiên"
                      color="primary"
-                     @click="onRandomSampleClick" />
+                     @click="onRandomSampleClick()" />
               <q-btn label="Xóa đoạn văn"
                      @click="inputText = ''" />
               <q-btn-dropdown color="purple"
                               split
                               label="Bài học ngẫu nhiên"
-                              @click="onRandomLessonClick">
+                              @click="onRandomLessonClick()">
                 <q-list>
                   <template v-for="({ id, title }) in lessonTitleList"
                             :key="id">
@@ -69,10 +69,10 @@
 
 <script setup lang="ts">
 import { QBtn } from 'quasar'
-import db, { type Lesson } from 'src/db'
+import db from 'src/db'
 import HighlightWords from 'src/components/HighlightWords.vue'
 import { useLessonTitleList } from 'src/services/lessonService'
-import { pullFromCloud, randomLesson } from 'src/services/lessonService'
+import { pullFromCloud, randomLesson, lessonToText } from 'src/services/lessonService'
 import { randomSentence } from 'src/services/sentenceService'
 import SentencesTags from 'src/components/SentencesTags.vue'
 
@@ -82,8 +82,6 @@ const inputText = ref('')
 const fontSize = ref(2)
 
 const lessonTitleList = useLessonTitleList()
-
-const lessonToText = ({ title, content }: Lesson) => `${title}\n\n${content}`
 
 async function onLessonClick(id: number) {
   const lesson = await db.lessons.get(id)
@@ -116,6 +114,7 @@ onMounted(() => {
       })
     }
   })
+
 })
 
 </script>
