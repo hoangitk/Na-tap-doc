@@ -1,40 +1,45 @@
 <template>
-  <div class="q-mt-md"
-       :style="{ fontSize: `${fontSize}rem` }">
+  <div class="highlight-words q-mt-md"
+       :class="{ 'highlight': highlight }"
+       :style="{ '--font-size': `${fontSize}rem` }">
     <template v-if="words.length === 0">
       <p style="color: red">Vui lòng nhập đoạn văn!</p>
     </template>
     <template v-else>
-      <div class="q-gutter-sm">
-        <template v-for="({ type, value, syllable }, index) in words"
-                  :key="index">
-          <template v-if="'word' === type && syllable">
-            <span class="syllable">
-              <span v-if="syllable[0]"
-                    class="initial-consonant">
-                {{ syllable[0] }}
-              </span>
-              <span class="rhyme">
-                {{ syllable[1] }}
-              </span>
-            </span>
-          </template>
-          <br v-else-if="'newline' === type" />
-          <span v-else>{{ value }}</span>
-        </template>
-      </div>
+      <template v-for="({ type, value, syllable }, index) in words"
+                :key="index">
+
+        <span v-if="'word' === type && syllable"
+              class="vocabulary word">
+          <span v-if="syllable[0]"
+                class="initial-consonant">
+            {{ syllable[0] }}
+          </span>
+          <span class="rhyme">
+            {{ syllable[1] }}
+          </span>
+        </span>
+
+        <span v-else-if="'number' === type"
+              class="vocabulary number">{{ value }}</span>
+
+        <span v-else-if="'punctuation' === type"
+              class="punctuation">{{ value }}</span>
+
+        <br v-else-if="'newline' === type"
+            class="newline" />
+      </template>
     </template>
   </div>
 </template>
 
 <script setup lang="ts">
 
-export interface HighlightWordsProps {
-  content: string,
-  fontSize: number
-}
-
-const props = defineProps<HighlightWordsProps>()
+const { content = '', fontSize = 2, highlight = true } = defineProps<{
+  content?: string,
+  fontSize?: number,
+  highlight?: boolean
+}>()
 
 // Danh sách phụ âm đầu
 const initialConsonants = [
@@ -43,8 +48,7 @@ const initialConsonants = [
   'b', 'c', 'd', 'đ', 'g', 'h', 'k', 'l', 'm', 'n', 'p', 's', 'r', 't', 'x', 'v' // 1 ký tự
 ]
 
-const words = computed(() => processNPL(props.content))
-const fontSize = computed(() => props.fontSize ?? 2)
+const words = computed(() => processNPL(content))
 
 function processNPL(sentence: string) {
   const regex = /(\r\n|\n)|(\p{L}+)|(\p{N}+)|([^\p{L}\p{N}\s])/gu
@@ -79,25 +83,45 @@ function splitSyllable(syllable: string) {
 </script>
 
 
-<style lang="scss" scoped>
-.output {
-  line-height: 1.6;
-  text-align: left;
-}
+<style lang="scss">
+.highlight-words {
+  font-size: var(--font-size, '2rem');
 
-.initial-consonant {
-  color: blue;
-  font-weight: bold;
-  cursor: pointer;
-}
+  .vocabulary {
+    display: inline-block;
+    transition: transform 0.2s ease-in-out;
 
-.rhyme {
-  color: red;
-  cursor: pointer;
-}
+    &:hover {
+      outline: 1px blue solid;
+      border: 0.2rem;
+      border-radius: 0.2rem;
+      transform: scale(1.1);
+      padding: 0 .5rem;
+    }
 
-.syllable {
-  display: inline-block;
-  margin-right: .5rem;
+  }
+
+  .vocabulary+.vocabulary {
+    margin-left: .5em;
+  }
+
+  .punctuation+.vocabulary {
+    margin-left: .5em;
+  }
+
+  &.highlight {
+
+    .initial-consonant {
+      color: blue;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .rhyme {
+      color: red;
+      cursor: pointer;
+    }
+
+  }
 }
 </style>

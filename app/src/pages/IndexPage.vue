@@ -18,8 +18,6 @@
               <q-btn label="Câu ngẫu nhiên"
                      color="primary"
                      @click="onRandomSampleClick()" />
-              <q-btn label="Xóa đoạn văn"
-                     @click="inputText = ''" />
               <q-btn-dropdown color="purple"
                               split
                               label="Bài học ngẫu nhiên"
@@ -37,6 +35,10 @@
                   </template>
                 </q-list>
               </q-btn-dropdown>
+              <q-btn label="Xóa đoạn văn"
+                     @click="inputText = ''" />
+              <q-toggle v-model="highlight"
+                        label="Tách âm tiết" />
             </div>
           </div>
           <div class="col-auto">
@@ -54,7 +56,8 @@
 
         <q-card-section>
           <highlight-words :content="inputText"
-                           :fontSize></highlight-words>
+                           :fontSize
+                           :highlight></highlight-words>
         </q-card-section>
 
         <q-card-section>
@@ -80,6 +83,7 @@ const $q = useQuasar()
 
 const inputText = ref('')
 const fontSize = ref(2)
+const highlight = ref(true)
 
 const lessonTitleList = useLessonTitleList()
 
@@ -115,6 +119,7 @@ onMounted(() => {
     }
   })
 
+  void onRandomSampleClick()
 })
 
 </script>
